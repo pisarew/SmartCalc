@@ -372,9 +372,8 @@ enum Interaction {
              ///< derived layerables, other layout elements,...)
   ,
   iSelectPlottablesBeyondAxisRect =
-      0x100  ///< <tt>0x100</tt> When performing plottable selection/hit
-             ///< ModelTest, this flag extends the sensitive area beyond the
-             ///< axis rect
+      0x100  ///< <tt>0x100</tt> When performing plottable selection/hit tests,
+             ///< this flag extends the sensitive area beyond the axis rect
 };
 Q_DECLARE_FLAGS(Interactions, Interaction)
 

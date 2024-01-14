@@ -24,17 +24,12 @@ class CalcModel {
   CalcModel();
 
   /**
-   * @brief Деструктор объекта CalcModel.
-   */
-  ~CalcModel();
-
-  /**
    * @brief Выполняет вычисление арифметического выражения.
    *
    * @param expr Строковое представление арифметического выражения.
    * @return Результат вычисления выражения.
    */
-  double Calculate(const std::string& expr);
+  [[nodiscard]] double Calculate(const std::string& expr) const;
 
   /**
    * @brief Обновляет значение переменной x для последующих вычислений.
@@ -44,14 +39,13 @@ class CalcModel {
   void UpdateX(double new_x) noexcept;
 
  private:
-  std::string* expr_;  ///< Указатель на текущее арифметическое выражение.
-  double x_;           ///< Значение переменной x.
+  double x_;  ///< Значение переменной x.
 
-  std::unordered_map<std::string, int> op_priority_{
+  const std::unordered_map<std::string, int> op_priority_{
       ///< Приоритеты операторов.
-      {"+", 1}, {"-", 1}, {"*", 2}, {"/", 2}, {"%", 2}, {"^", 3}};
+      {"+", 1}, {"-", 1}, {"*", 2}, {"/", 2}, {"%", 2}, {"^", 3}, {"(", 0}};
 
-  std::unordered_map<std::string, int> func_priority_{
+  const std::unordered_map<std::string, int> func_priority_{
       ///< Приоритеты функций.
       {"sin", 4},  {"cos", 4},  {"tan", 4}, {"asin", 4}, {"acos", 4},
       {"atan", 4}, {"sqrt", 4}, {"ln", 4},  {"log", 4},
@@ -62,14 +56,15 @@ class CalcModel {
    *
    * @return Список строк с выражением в постфиксной форме.
    */
-  std::list<std::string> GetPostfixExpr();
+  [[nodiscard]] std::list<std::string> GetPostfixExpr(
+      const std::string& expr) const;
 
   /**
    * @brief Анализирует входное арифметическое выражение.
    *
    * @return Список строк с анализированным выражением.
    */
-  std::list<std::string> Parse();
+  static std::list<std::string> Parse(const std::string& expr) noexcept;
 
   /**
    * @brief Выполняет операцию между двумя операндами.
@@ -105,7 +100,7 @@ class CalcModel {
    * @return true, если строка представляет оператор, в противном случае -
    * false.
    */
-  bool IsOperator(const std::string& str) noexcept;
+  [[nodiscard]] bool IsOperator(const std::string& str) const noexcept;
 
   /**
    * @brief Проверяет, является ли строка функцией.
@@ -113,7 +108,7 @@ class CalcModel {
    * @param str Строка для проверки.
    * @return true, если строка представляет функцию, в противном случае - false.
    */
-  bool IsFunction(const std::string& str) noexcept;
+  [[nodiscard]] bool IsFunction(const std::string& str) const noexcept;
 
   /**
    * @brief Получает приоритет оператора или функции.
@@ -121,7 +116,7 @@ class CalcModel {
    * @param str Строка с оператором или функцией.
    * @return Приоритет оператора или функции.
    */
-  int GetPriority(const std::string& str) noexcept;
+  [[nodiscard]] int GetPriority(const std::string& str) const noexcept;
 
   /**
    * @brief Проверяет и валидирует арифметическое выражение.

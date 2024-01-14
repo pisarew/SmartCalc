@@ -7,14 +7,11 @@
 #include <cmath>
 #include <regex>
 
-s21::CalcModel::CalcModel() : expr_(nullptr), x_(0) {}
+s21::CalcModel::CalcModel() : x_(0) {}
 
-s21::CalcModel::~CalcModel() { delete expr_; }
-
-double s21::CalcModel::Calculate(const std::string &expr) {
+double s21::CalcModel::Calculate(const std::string &expr) const {
   try {
-    expr_ = new std::string(expr);
-    auto postfix_expr = GetPostfixExpr();
+    auto postfix_expr = GetPostfixExpr(expr);
     std::stack<double> result;
 
     for (const auto &token : postfix_expr) {
@@ -34,28 +31,34 @@ double s21::CalcModel::Calculate(const std::string &expr) {
         result.push(Execute(token, x));
       }
     }
-
-    delete expr_;
-    expr_ = nullptr;
     return result.top();
   } catch (std::exception &ex) {
     throw ex;
   }
 }
 
-std::list<std::string> s21::CalcModel::GetPostfixExpr() {
-  auto expr = Parse();
+std::list<std::string> s21::CalcModel::GetPostfixExpr(
+    const std::string &expr) const {
+  auto list_expr = Parse(expr);
   try {
-    ValidateExpr(expr);
+    ValidateExpr(list_expr);
   } catch (std::invalid_argument &ex) {
     throw ex;
   }
   std::list<std::string> output_list;
   std::stack<std::string> tmp_stack;
 
-  for (const auto &token : expr) {
+  for (const auto &token : list_expr) {
     if (IsDouble(token) || token == "X") {
       output_list.push_back(token);
+    } else if (token == "(") {
+      tmp_stack.push(token);
+    } else if (token == ")") {
+      while (!tmp_stack.empty() && tmp_stack.top() != "(") {
+        output_list.push_back(tmp_stack.top());
+        tmp_stack.pop();
+      }
+      tmp_stack.pop();
     } else if (IsOperator(token)) {
       while (!tmp_stack.empty() && token != "(" &&
              GetPriority(token) <= GetPriority(tmp_stack.top())) {
@@ -65,14 +68,6 @@ std::list<std::string> s21::CalcModel::GetPostfixExpr() {
       tmp_stack.push(token);
     } else if (IsFunction(token)) {
       tmp_stack.push(token);
-    } else if (token == "(") {
-      tmp_stack.push(token);
-    } else if (token == ")") {
-      while (!tmp_stack.empty() && tmp_stack.top() != "(") {
-        output_list.push_back(tmp_stack.top());
-        tmp_stack.pop();
-      }
-      tmp_stack.pop();
     }
   }
 
@@ -83,7 +78,7 @@ std::list<std::string> s21::CalcModel::GetPostfixExpr() {
   return output_list;
 }
 
-std::list<std::string> s21::CalcModel::Parse() {
+std::list<std::string> s21::CalcModel::Parse(const std::string &expr) noexcept {
   std::list<std::string> output_expr;
 
   std::regex pattern(
@@ -91,7 +86,7 @@ std::list<std::string> s21::CalcModel::Parse() {
 
   std::regex_token_iterator<std::string::const_iterator> end;
   std::regex_token_iterator<std::string::const_iterator> it(
-      expr_->begin(), expr_->end(), pattern);
+      expr.begin(), expr.end(), pattern);
   for (; it != end; ++it) {
     output_expr.push_back(it->str());
   }
@@ -108,16 +103,17 @@ bool s21::CalcModel::IsDouble(const std::string &str) noexcept {
   }
 }
 
-bool s21::CalcModel::IsOperator(const std::string &str) noexcept {
+bool s21::CalcModel::IsOperator(const std::string &str) const noexcept {
   return op_priority_.find(str) != op_priority_.end();
 }
 
-bool s21::CalcModel::IsFunction(const std::string &str) noexcept {
+bool s21::CalcModel::IsFunction(const std::string &str) const noexcept {
   return func_priority_.find(str) != func_priority_.end();
 }
 
-int s21::CalcModel::GetPriority(const std::string &str) noexcept {
-  return IsOperator(str) ? op_priority_[str] : func_priority_[str];
+int s21::CalcModel::GetPriority(const std::string &str) const noexcept {
+  return IsOperator(str) ? op_priority_.find(str)->second
+                         : func_priority_.find(str)->second;
 }
 
 double s21::CalcModel::Execute(const std::string &op, double a, double b) {

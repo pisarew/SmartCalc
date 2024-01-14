@@ -15,15 +15,15 @@ class Controller : public QObject {
   Q_OBJECT
 
  public:
-  Controller(CalcModel* model, CalcView* view);
+  Controller(CalcModel& model, CalcView& view);
 
  private slots:
   void OnExecuteButtonClicked();
   void OnGraphButtonClicked();
 
  private:
-  CalcModel* model_;
-  CalcView* view_;
+  CalcModel& model_;
+  CalcView& view_;
 };
 }  // namespace s21
 

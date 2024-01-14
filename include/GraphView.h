@@ -15,7 +15,8 @@ class GraphView : public QDialog {
   Q_OBJECT
 
  public:
-  explicit GraphView(const QString& expr);
+  explicit GraphView(const QString& expr, QMainWindow* parent = nullptr);
+  ~GraphView() override;
 
  private:
   Ui::Graph* ui_;

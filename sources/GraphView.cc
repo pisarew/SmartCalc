@@ -6,8 +6,8 @@
 
 #include "CalcModel.h"
 
-s21::GraphView::GraphView(const QString& expr)
-    : QDialog(nullptr),
+s21::GraphView::GraphView(const QString& expr, QMainWindow* parent)
+    : QDialog(parent),
       ui_(new Ui::Graph),
       expr_(new QString(expr)),
       plot_(new QCustomPlot) {
@@ -15,6 +15,9 @@ s21::GraphView::GraphView(const QString& expr)
   ui_->graphLayout->addWidget(plot_);
   PlotGraph();
 }
+
+s21::GraphView::~GraphView() { delete ui_; }
+
 void s21::GraphView::PlotGraph() {
   auto x_max = ui_->spinBoxXMax->value();
   auto x_min = ui_->spinBoxXMin->value();
@@ -30,12 +33,14 @@ void s21::GraphView::PlotGraph() {
   double step = (x_max - x_min) / 999.0;
 
   QVector<double> x(1000), y(1000);
-  x[0] = x_min;
-
   CalcModel model;
-  for (int i = 1; i < 999; ++i) {
-    model.UpdateX(x[i - 1]);
+  x[0] = x_min;
+  model.UpdateX(x[0]);
+  y[0] = model.Calculate(expr_->toStdString());
+
+  for (int i = 1; i <= 999; ++i) {
     x[i] = x[i - 1] + step;
+    model.UpdateX(x[i]);
     y[i] = model.Calculate(expr_->toStdString());
   }
   plot_->graph(0)->addData(x, y);

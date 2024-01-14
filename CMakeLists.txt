@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(CPP3_SmartCalc_v2_0_1)
+project(SmartCalc)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -26,3 +26,12 @@ qt_add_executable(SmartCalc
         sources/qcustomplot.cpp)
 
 target_link_libraries(SmartCalc PRIVATE Qt6::Core Qt6::Widgets Qt6::PrintSupport)
+
+find_package(GTest)
+
+add_executable(ModelTest
+        sources/tests/ModelTest.cc
+        sources/CalcModel.cc
+        include/CalcModel.h)
+
+target_link_libraries(ModelTest GTest::gtest_main)

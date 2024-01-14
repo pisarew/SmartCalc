@@ -15,6 +15,7 @@ class CalcView : public QMainWindow {
 
  public:
   CalcView();
+  ~CalcView() override;
 
   void SetText(const QString &text);
   QString GetText();
@@ -29,7 +30,7 @@ class CalcView : public QMainWindow {
   void on_mulButton_clicked();
 
  private:
-  Ui::SmartCalc *ui;
+  Ui::SmartCalc *ui_;
 };
 }  // namespace s21
 #endif  // CPP3_SMARTCALC_V2_0_1_CALCVIEW_H

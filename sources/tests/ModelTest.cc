@@ -79,7 +79,9 @@ TEST(ModelTest, arithmetic_test_12) {
 
 TEST(ModelTest, exception_test_00) {
   s21::CalcModel model;
-  EXPECT_THROW(model.Calculate("((1+1)"), std::exception);
+  double tmp = 0.0;
+  EXPECT_THROW(tmp = model.Calculate("((1+1)"), std::exception);
+  EXPECT_NEAR(tmp, 0, EXP);
 }
 
 }  // namespace
