@@ -14,15 +14,21 @@ namespace s21 {
 class GraphView : public QDialog {
   Q_OBJECT
 
+ signals:
+  void ExecuteSig(const QString& expr, double x);
+
  public:
   explicit GraphView(const QString& expr, QMainWindow* parent = nullptr);
   ~GraphView() override;
 
+  void UpdateY(double y);
+  void PlotGraph();
+
  private:
   Ui::Graph* ui_;
   QCustomPlot* plot_;
-  QString* expr_;
-  void PlotGraph();
+  const QString& expr_;
+  double y_;
 
  private slots:
   void on_plotButton_clicked();

@@ -14,7 +14,7 @@ s21::CalcView::CalcView() : QMainWindow(nullptr), ui_(new Ui::SmartCalc) {
 s21::CalcView::~CalcView() { delete ui_; }
 
 void s21::CalcView::on_enterButtonGroup_buttonClicked(QAbstractButton *button) {
-  if (GetText() == "0" || GetText() == "CALCULATION ERROR")
+  if (GetText() == "0" || GetText() == "ERROR" || GetText() == "nan" || GetText() == "inf")
     SetText(button->text());
   else
     SetText(GetText() + button->text());

@@ -9,11 +9,11 @@
 s21::GraphView::GraphView(const QString& expr, QMainWindow* parent)
     : QDialog(parent),
       ui_(new Ui::Graph),
-      expr_(new QString(expr)),
-      plot_(new QCustomPlot) {
+      expr_(expr),
+      plot_(new QCustomPlot),
+      y_(0.0) {
   ui_->setupUi(this);
   ui_->graphLayout->addWidget(plot_);
-  PlotGraph();
 }
 
 s21::GraphView::~GraphView() { delete ui_; }
@@ -33,17 +33,17 @@ void s21::GraphView::PlotGraph() {
   double step = (x_max - x_min) / 999.0;
 
   QVector<double> x(1000), y(1000);
-  CalcModel model;
   x[0] = x_min;
-  model.UpdateX(x[0]);
-  y[0] = model.Calculate(expr_->toStdString());
+  emit ExecuteSig(expr_, x[0]);
+  y[0] = y_;
 
   for (int i = 1; i <= 999; ++i) {
     x[i] = x[i - 1] + step;
-    model.UpdateX(x[i]);
-    y[i] = model.Calculate(expr_->toStdString());
+    emit ExecuteSig(expr_, x[i]);
+    y[i] = y_;
   }
   plot_->graph(0)->addData(x, y);
   plot_->replot();
 }
 void s21::GraphView::on_plotButton_clicked() { PlotGraph(); }
+void s21::GraphView::UpdateY(double y) { y_ = y; }
